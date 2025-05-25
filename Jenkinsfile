@@ -1,0 +1,87 @@
+#!/usr/bin/env groovy
+library identifier: 'devops-shared-lib@master', retriever: modernSCM(
+    [
+        $class: 'GitSCMSource',
+        remote: 'https://github.com/TheSudheer/Jenkins-shared-library.git',
+        credentialsId: 'GitHub'
+    ]
+)
+
+pipeline {
+    agent any
+    
+    options {
+        timeout(time: 10, unit: 'MINUTES')
+    }
+    environment {
+        AWS_ECR_REPO = "710271936636.dkr.ecr.ap-south-1.amazonaws.com/django-app"
+        imageTag = "latest"
+    }
+    stages {
+
+        stage("build docker image") {
+            steps {
+                script {
+                    echo "Starting build image stage"
+                    timeout(time: 3, unit: 'MINUTES') {
+                        aws_Ecr(env.AWS_ECR_REPO, env.imageTag)
+                    // This piece of code was written using the jenkins-shared-library from:
+                    // https://github.com/TheSudheer/Jenkins-shared-library.git
+                    }
+                    echo "Finished build image stage"
+                }
+            }
+        }
+        stage("Configure Kubeconfig and Test Connectivity") {
+            steps {
+                echo "Starting Configure Kubeconfig and Test Connectivity stage"
+                withCredentials([
+                    string(credentialsId: 'jenkins_aws_access_key_id', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'jenkins_aws_secret_access_key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    timeout(time: 3, unit: 'MINUTES') {
+                        sh '''
+                            set -x
+                            echo "Verifying AWS CLI version..."
+                            aws --version
+
+                            echo "Setting AWS_DEFAULT_REGION to ap-southeast-1..."
+                            export AWS_DEFAULT_REGION=ap-south-1
+
+                            echo "Updating kubeconfig for cluster demo-cluster-3..."
+                            aws eks update-kubeconfig --region=ap-southeast-1 --name=demo-cluster-3
+
+                            echo "Listing Kubernetes nodes..."
+                            kubectl get nodes
+                            set +x
+                        '''
+                    }
+                }
+                echo "Finished Configure Kubeconfig and Test Connectivity stage"
+            }
+        }
+        stage("deploy") {
+            environment {
+                AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
+                AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
+                APP_NAME = 'django-app'
+                IMAGE_NAME = "${env.imageTag}"
+            }
+            steps {
+                script {
+                    echo "Starting deploy stage"
+                    timeout(time: 3, unit: 'MINUTES') {
+                        sh '''
+                            set -x
+                            echo "Deploying using kubernetes/deployment.yaml..."
+                            envsubst < kubernetes/app-deployment.yml | kubectl apply -f -
+
+                        '''
+                    }
+                    echo "Finished deploy stage"
+                }
+            }
+        }
+    }
+}
+
