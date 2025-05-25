@@ -77,10 +77,6 @@ pipeline {
                             set -x
                             echo "Deploying using kubernetes/deployment.yaml..."
                             envsubst < kubernetes/app-deployment.yml | kubectl apply -f -
-
-                            echo "Deploying using kubernetes/service.yaml..."
-                            envsubst < kubernetes/db.yaml | kubectl apply -f -
-                            set +x
                         '''
                     }
                     echo "Finished deploy stage"
