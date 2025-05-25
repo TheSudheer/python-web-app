@@ -14,6 +14,7 @@ pipeline {
         timeout(time: 10, unit: 'MINUTES')
     }
     environment {
+        AWS_ECR_SERVER = "710271936636.dkr.ecr.ap-south-1.amazonaws.com"
         AWS_ECR_REPO = "710271936636.dkr.ecr.ap-south-1.amazonaws.com/django-app"
         imageTag = "latest"
     }
