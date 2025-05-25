@@ -14,6 +14,8 @@ spec:
       labels:
         app: ${APP_NAME}
     spec:
+      imagePullSecrets:
+        - name: aws-registry-key
       containers:
       - name: ${APP_NAME}
         image: ${AWS_ECR_REPO}:${imageTag}
