@@ -25,7 +25,7 @@ pipeline {
                 script {
                     echo "Starting build image stage"
                     timeout(time: 3, unit: 'MINUTES') {
-                        aws_Ecr(env.AWS_ECR_REPO, env.imageTag)
+                        aws_Ecr(env.AWS_ECR_SERVER, env.AWS_ECR_REPO, env.imageTag)
                     // This piece of code was written using the jenkins-shared-library from:
                     // https://github.com/TheSudheer/Jenkins-shared-library.git
                     }
