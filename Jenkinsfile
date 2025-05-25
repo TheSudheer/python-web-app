@@ -34,14 +34,14 @@ pipeline {
                 }
             }
         }
-        steps {
+        steps ("Creating K8s cluster using terraform") {
                 script {
                     dir ("terraform-eks-cluster") {
                         sh "terraform init"
                         sh "terraform apply --auto-approve"
                     }
                 }
-            }
+        }
         stage("Configure Kubeconfig and Test Connectivity") {
             steps {
                 echo "Starting Configure Kubeconfig and Test Connectivity stage"
