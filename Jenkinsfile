@@ -7,6 +7,7 @@ library identifier: 'devops-shared-lib@master', retriever: modernSCM(
     ]
 )
 
+
 pipeline {
     agent any
     
@@ -16,16 +17,16 @@ pipeline {
     environment {
         AWS_ECR_SERVER = "710271936636.dkr.ecr.ap-south-1.amazonaws.com"
         AWS_ECR_REPO = "710271936636.dkr.ecr.ap-south-1.amazonaws.com/django-app"
-        imageTag = "latest"
+        imageName = "latest"
     }
     stages {
 
-        stage("build docker image") {
+        stage("build image") {
             steps {
                 script {
                     echo "Starting build image stage"
                     timeout(time: 3, unit: 'MINUTES') {
-                        aws_Ecr(env.AWS_ECR_SERVER, env.AWS_ECR_REPO, env.imageTag)
+                        aws_Ecr(env.AWS_ECR_REPO, env.imageName)
                     // This piece of code was written using the jenkins-shared-library from:
                     // https://github.com/TheSudheer/Jenkins-shared-library.git
                     }
@@ -66,7 +67,7 @@ pipeline {
                 AWS_ACCESS_KEY_ID = credentials('jenkins_aws_access_key_id')
                 AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
                 APP_NAME = 'django-app'
-                IMAGE_NAME = "${env.imageTag}"
+                IMAGE_NAME = "${env.imageName}"
             }
             steps {
                 script {
@@ -77,6 +78,9 @@ pipeline {
                             echo "Deploying using kubernetes/deployment.yaml..."
                             envsubst < kubernetes/app-deployment.yml | kubectl apply -f -
 
+                            echo "Deploying using kubernetes/service.yaml..."
+                            envsubst < kubernetes/db.yaml | kubectl apply -f -
+                            set +x
                         '''
                     }
                     echo "Finished deploy stage"
@@ -85,4 +89,3 @@ pipeline {
         }
     }
 }
-
