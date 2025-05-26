@@ -12,7 +12,7 @@ pipeline {
     agent any
     
     options {
-        timeout(time: 10, unit: 'MINUTES')
+        timeout(time: 50, unit: 'MINUTES')
     }
     environment {
         AWS_ECR_SERVER = "710271936636.dkr.ecr.ap-south-1.amazonaws.com"
@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script {
                     echo "Starting build image stage"
-                    timeout(time: 3, unit: 'MINUTES') {
+                    timeout(time: 5, unit: 'MINUTES') {
                         aws_Ecr(env.AWS_ECR_REPO, env.imageName)
                     // This piece of code was written using the jenkins-shared-library from:
                     // https://github.com/TheSudheer/Jenkins-shared-library.git
@@ -55,7 +55,7 @@ pipeline {
                     string(credentialsId: 'jenkins_aws_access_key_id', variable: 'AWS_ACCESS_KEY_ID'),
                     string(credentialsId: 'jenkins_aws_secret_access_key', variable: 'AWS_SECRET_ACCESS_KEY')
                 ]) {
-                    timeout(time: 3, unit: 'MINUTES') {
+                    timeout(time: 10, unit: 'MINUTES') {
                         sh '''
                             set -x
                             echo "Verifying AWS CLI version..."
@@ -86,7 +86,7 @@ pipeline {
             steps {
                 script {
                     echo "Starting deploy stage"
-                    timeout(time: 3, unit: 'MINUTES') {
+                    timeout(time: 8, unit: 'MINUTES') {
                         sh '''
                             set -x
                             echo "Deploying using kubernetes/deployment.yaml..."
