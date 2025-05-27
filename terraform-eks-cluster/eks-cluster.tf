@@ -4,7 +4,7 @@ module "eks" {
 
   # Basic Cluster Information
   cluster_name    = "myapp-eks-cluster"
-  cluster_version = "1.27"
+  cluster_version = "1.28"
 
   # Networking configuration: Worker nodes will be placed in the private subnets
   subnet_ids = module.vpc.private_subnets
