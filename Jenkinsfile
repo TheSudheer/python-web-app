@@ -1,3 +1,4 @@
+#!/usr/bin/env groovy
 
 pipeline {
     agent any
@@ -73,18 +74,29 @@ pipeline {
             environment {
                 AWS_ACCESS_KEY_ID     = credentials('jenkins_aws_access_key_id')
                 AWS_SECRET_ACCESS_KEY = credentials('jenkins_aws_secret_access_key')
-                APP_NAME            = 'django-app'
-                IMAGE_NAME          = "${env.imageName}"
+                APP_NAME              = 'django-app'
+                IMAGE_NAME            = "${env.imageName}"
+                AWS_ECR_SERVER        = "710271936636.dkr.ecr.ap-south-1.amazonaws.com"
             }
             steps {
                 script {
-                    echo "Starting deploy stage"
-                    timeout(time: 8, unit: 'MINUTES') {
-                        sh '''
-                            set -x
-                            echo "Deploying using kubernetes/deployment.yaml..."
-                            envsubst < kubernetes/app-deployment.yml | kubectl apply -f -
-                        '''
+                    withCredentials([usernamePassword(credentialsId: 'ecr-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        echo "Starting deploy stage"
+                        timeout(time: 8, unit: 'MINUTES') {
+                            sh '''
+                                set -x
+                                echo "Deploying kubernetes/db.yml..."
+                                envsubst < kubernetes/db.yml | kubectl apply -f -
+
+                                echo "Deploying kubernetes/secret.yml..."
+                                envsubst < kubernetes/secret.yml | kubectl apply -f -
+
+                                echo "Deploying kubernetes/deployment.yaml..."
+                                envsubst < kubernetes/app-deployment.yml | kubectl apply -f -
+
+                                set +x
+                            '''
+                        }
                     }
                     echo "Finished deploy stage"
                 }
