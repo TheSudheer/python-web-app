@@ -15,16 +15,14 @@ RUN apt-get update && \
 
 COPY requirements.txt .
 
+RUN sed -i '/pywin32==/d' requirements.txt
+
 RUN pip install --no-cache-dir --upgrade pip \
  && pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
 EXPOSE 8000
-
-RUN apt-get purge -y build-essential pkg-config \
- && apt-get autoremove -y \
- && rm -rf /var/lib/apt/lists/*
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 
