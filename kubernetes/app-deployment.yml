@@ -23,15 +23,15 @@ spec:
           ports:
             - containerPort: 8000
           env:
-            - name: DJANGO_SETTINGS_MODULE
-              value: "devops.settings"
+            - name: SECRET_KEY
+              value: '<secret key>'
             - name: DEBUG
-              value: "False"
+              value: ""
             # Database connection details for the MySQL StatefulSet
             - name: DB_HOST
               value: "mysql-db-0.mysql-headless.default.svc.cluster.local"
             - name: DB_PORT
-              value: "3306"
+              value: ":3306"
             - name: DB_NAME
               value: "demodb"
             - name: DB_USER
