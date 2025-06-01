@@ -1,50 +1,35 @@
 FROM python:3.11-slim
-
-ENV #Framework
-SECRET_KEY='<secret key>'
-DEBUG=true
-APP_ENV=local #use one of local/sit/uat/prod
-
-#Email
-EMAIL_HOST='<Host>'
-EMAIL_PORT=587
-EMAIL_USE_TLS=true
-EMAIL_HOST_USER='<email address>'
-EMAIL_HOST_PASSWORD='<pwd>'
-
-#Database
-DATABASE_NAME=<db name>
-DATABASE_USER=root
-DATABASE_PASSWORD=
-DATABASE_HOST=localhost
-DATABASE_PORT=3306
-DB_ROOT_PASSWORD=
  
-#Timezone
-LANGUAGE_CODE='en-us'
-TIME_ZONE='UTC'
-USE_I18N=true
-USE_TZ=true
+# Use an official Python runtime image as the base image
+FROM python:3.11-slim
 
-#API
-CORS_ORIGIN_ALLOW_ALL=false
+# Set environment variables for application configuration
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    SECRET_KEY="your-secret-key" \
+    DB_HOST="localhost" \
+    DB_PORT=5432 \
+    API_ENDPOINT="https://api.example.com" \
+    LOG_LEVEL="INFO" \
+    APP_MODE="production" \
+    CACHE_TIMEOUT=300 \
+    MAX_CONNECTIONS=100
 
-#Media
-BASE_URL='<base url>'
+# Set the working directory in the container
+WORKDIR /app
 
-#MSAL CRED
-#MS_EMAIL = '<email>'
-#TENANT_ID = '<TENANT_ID>'
-#CLIENT_ID = '<CLIENT_ID>'
-#CLIENT_SECRET = '<CLIENT_SECRET>'
+# Install Python dependencies (add your requirements file)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-MS_EMAIL = '<MS_EMAIL>'
-TENANT_ID = '<TENANT_ID>'
-CLIENT_ID = '<CLIENT_ID>'
-CLIENT_SECRET = '<CLIENT_SECRET>'
+# Copy the rest of the application code into the container
+COPY . .
 
-WHATSAPP_ID='<WHATSAPP_ID>'
-WHATSAPP_API_KEY='<WHATSAPP_API_KEY>'
+# Expose the port the app runs on (if applicable)
+EXPOSE 8000
+
+# Define the command to run the application
+CMD ["python", "app.py"] 
 
 WORKDIR /app
 
