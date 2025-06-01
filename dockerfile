@@ -18,6 +18,15 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Set the working directory in the container
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    make \
+    libffi-dev \
+    python3-dev \
+    default-libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install Python dependencies (add your requirements file)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
