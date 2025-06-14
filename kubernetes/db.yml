@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -38,6 +37,7 @@ spec:
     - metadata:
         name: db-data
       spec:
+        storageClassName: gp2
         accessModes:
           - ReadWriteOnce
         resources:
