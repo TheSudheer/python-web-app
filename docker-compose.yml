@@ -13,28 +13,17 @@ services:
       - '8000:8000'
     depends_on:
       - mysql-db
-    environment:
-      # Django settings
-      DEBUG: "True"
-      SECRET_KEY: "your-very-secret-key"
-      ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
-      # Database settings (hard‑coded)
-      DB_ENGINE: "django.db.backends.mysql"
-      DB_NAME: "app_db"
-      DB_USER: "app_user"
-      DB_PASSWORD: "securepass123"
-      DB_HOST: "mysql-db"
-      DB_PORT: "3306"
+    # <-- pick up all vars from .env
+    env_file:
+      - .env
 
   mysql-db:
     image: mysql:8.0
     container_name: mysql-db
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: "rootpassword123"
-      MYSQL_DATABASE: "app_db"
-      MYSQL_USER: "app_user"
-      MYSQL_PASSWORD: "securepass123"
+    # <-- same .env (or you can split into mysql.env if preferred)
+    env_file:
+      - .env
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
