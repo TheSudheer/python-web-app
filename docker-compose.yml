@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: django-app
+    command: >
+      sh -c "source venv1/bin/activate &&
+             python3 manage.py runserver 0.0.0.0:8000"
+    ports:
+      - '8000:8000'
+    depends_on:
+      - mysql-db
+    environment:
+      # Django settings
+      DEBUG: "True"
+      SECRET_KEY: "your-very-secret-key"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
+      # Database settings (hard‑coded)
+      DB_ENGINE: "django.db.backends.mysql"
+      DB_NAME: "app_db"
+      DB_USER: "app_user"
+      DB_PASSWORD: "securepass123"
+      DB_HOST: "mysql-db"
+      DB_PORT: "3306"
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "rootpassword123"
+      MYSQL_DATABASE: "app_db"
+      MYSQL_USER: "app_user"
+      MYSQL_PASSWORD: "securepass123"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - '3306:3306'
+
+volumes:
+  mysql_data:
+
