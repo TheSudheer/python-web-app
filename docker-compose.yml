@@ -1,19 +1,15 @@
-version: '3.8'
-
+# docker-compose.yml
 services:
   web:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: django-app
-    command: >
-      sh -c "source venv1/bin/activate &&
-             python3 manage.py runserver 0.0.0.0:8000"
+    command: ./venv1/bin/python manage.py runserver 0.0.0.0:8000
     ports:
-      - '8000:8000'
+      - "8000:8000"
     depends_on:
       - mysql-db
-    # <-- pick up all vars from .env
     env_file:
       - .env
 
@@ -21,13 +17,12 @@ services:
     image: mysql:8.0
     container_name: mysql-db
     restart: always
-    # <-- same .env (or you can split into mysql.env if preferred)
     env_file:
       - .env
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
-      - '3306:3306'
+      - "3306:3306"
 
 volumes:
   mysql_data:
