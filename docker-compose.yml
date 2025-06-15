@@ -1,10 +1,10 @@
-# docker-compose.yml
 services:
   web:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: django-app
+    # Call the virtualenv's python directly—no 'source' or 'venvl' typo
     command: ./venv1/bin/python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
